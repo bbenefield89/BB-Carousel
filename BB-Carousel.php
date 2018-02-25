@@ -13,3 +13,20 @@
 
 */
   
+/************************
+** NAMESPACE & REQUIRE **
+************************/
+use Inc\Classes\admin as Admin;
+
+require_once 'inc/class/admin.php';
+
+/**********
+** BEGIN **
+**********/  
+// Security check
+if (!defined('ABSPATH')) {
+    exit();
+}
+
+// Create WP admin dashboard sidebar section for BB-Carousel
+add_action('admin_menu', 'Inc\Classes\Admin::admin_menu');
