@@ -30,3 +30,6 @@ if (!defined('ABSPATH')) {
 
 // Create WP admin dashboard sidebar section for BB-Carousel
 add_action('admin_menu', 'Inc\Classes\Admin::admin_menu');
+
+// Load plugin assets
+add_action('admin_enqueue_scripts', 'Inc\Classes\Admin::load_assets');

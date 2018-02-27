@@ -1,0 +1,134 @@
+/*
+
+A. Header
+B. Slider Settings
+  B.a Advanced Settings
+#. Media Queries
+*/
+
+/***********
+** HEADER **
+***********/
+#bb-carousel-main {
+  margin-right: 15px;
+}
+
+#bb-carousel-main > header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+#bb-carousel-main > header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-bottom: 1px solid rgba(0, 0, 0, .2);
+}
+
+#bb-carousel-main h1 {
+  margin-right: 1rem;
+}
+
+input[name="slider_name"] {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+/********************
+** SLIDER SETTINGS **
+********************/
+.slider-settings-container {
+  background: #fff;
+}
+
+.slider-settings-header {
+  background: #fff;
+  padding: 10px;
+  position: relative;
+}
+
+.slider-settings-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-bottom: 1px solid rgba(0, 0, 0, .2);
+}
+
+.slider-settings-header > h2 {
+  margin: 0;
+  position: relative;
+}
+
+.tab-closed::after {
+  content: '\0025B2';
+  font-size: 12px;
+  position: absolute;
+  right: 0;
+}
+
+.tab-open::after {
+  content: '\0025BC';
+  font-size: 12px;
+  position: absolute;
+  right: 0;
+}
+
+.slider-settings-content {
+  padding: 10px;
+  overflow: hidden;
+}
+
+.transition-time-container {
+  display: flex;
+  align-items: center;
+}
+
+.transition-time-container p {
+  margin-right: 1rem;
+}
+
+.transition-time-container input {
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, .2);
+}
+
+/**************************
+** B.a Advanced Settings **
+**************************/
+.advanced-options-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 300px;
+}
+
+.advanced-options-container > div {
+  display: flex;
+  align-items: center;
+}
+
+.advanced-options-container .advanced-options-p {
+  width: 125px;
+}
+
+.advanced-options-container > div > p {
+  margin-right: 1rem;
+}
+
+.advanced-options-container > div > input {
+  margin-top: 2px;
+}
+
+/*********************
+** #. MEDIA QUERIES **
+*********************/
+@media screen and (min-width: 507px) {
+  .advanced-options-container {
+    justify-content: flex-start;
+  }
+}
