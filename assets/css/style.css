@@ -1,14 +1,26 @@
 /*
-
-A. Header
-B. Slider Settings
-  B.a Advanced Settings
-#. Media Queries
+**
+** 1. Header
+**
+** 2. Slider Settings
+**  2.a Advanced Settings
+**
+** 3. Slider Images
+**
+** #. Media Queries
+**
 */
 
-/***********
-** HEADER **
-***********/
+/******************
+** GLOBAL STYLES **
+******************/
+.text-red {
+  color: hsl(0, 100%, 35%);
+}
+
+/**************
+** 1. HEADER **
+**************/
 #bb-carousel-main {
   margin-right: 15px;
 }
@@ -38,20 +50,25 @@ input[name="slider_name"] {
   width: 100%;
 }
 
-/********************
-** SLIDER SETTINGS **
-********************/
-.slider-settings-container {
+/***********************
+** 2. SLIDER SETTINGS **
+***********************/
+.slider-settings-container,
+.slider-images-container {
   background: #fff;
+  box-shadow: 0 2px 4px hsl(0, 0%, 70%);
+  margin-bottom: 1.5rem;
 }
 
-.slider-settings-header {
+.slider-settings-header,
+.slider-images-header {
   background: #fff;
   padding: 10px;
   position: relative;
 }
 
-.slider-settings-header::before {
+.slider-settings-header::before,
+.slider-images-header::before {
   content: '';
   position: absolute;
   bottom: 0;
@@ -60,7 +77,8 @@ input[name="slider_name"] {
   border-bottom: 1px solid rgba(0, 0, 0, .2);
 }
 
-.slider-settings-header > h2 {
+.slider-settings-header > h2,
+.slider-images-header > h2 {
   margin: 0;
   position: relative;
 }
@@ -79,7 +97,8 @@ input[name="slider_name"] {
   right: 0;
 }
 
-.slider-settings-content {
+.slider-settings-content,
+.slider-images-content {
   padding: 10px;
   overflow: hidden;
 }
@@ -89,27 +108,35 @@ input[name="slider_name"] {
   align-items: center;
 }
 
+.transition-time-container::after {
+  content: 'seconds';
+}
+
 .transition-time-container p {
   margin-right: 1rem;
 }
 
 .transition-time-container input {
-  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, .2);
+  box-shadow: inset 2px 2px 5px 1px rgba(0, 0, 0, .3);
+  margin-right: 5px;
+  width: 70px;
 }
 
 /**************************
-** B.a Advanced Settings **
+** 2.a Advanced Settings **
 **************************/
 .advanced-options-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  width: 300px;
+  width: 100%;
+  max-width: 400px;
 }
 
 .advanced-options-container > div {
   display: flex;
   align-items: center;
+  margin-right: 1rem;
 }
 
 .advanced-options-container .advanced-options-p {
@@ -125,10 +152,40 @@ input[name="slider_name"] {
 }
 
 /*********************
+** 3. SLIDER IMAGES **
+*********************/
+.slider-images {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+.slider-images .slider-image {
+  margin: 15px;
+  position: relative;
+}
+
+.remove-image {
+  content: '×';
+  color: red;
+  cursor: pointer;
+  font-size: 40px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/*********************
 ** #. MEDIA QUERIES **
 *********************/
 @media screen and (min-width: 507px) {
   .advanced-options-container {
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (min-width: 492px) {
+  .slider-images {
     justify-content: flex-start;
   }
 }

@@ -1,0 +1,74 @@
+<?php
+
+namespace Inc\Database;
+
+class Database {
+  public function __construct() {}
+  
+  // Plugin Activation
+  public static function activate() {
+    self::create_db_table();
+  }
+  
+  // Create the Database Table
+  protected function create_db_table(string $table, array $fields) {
+    global $wpdb;
+    $table_name = $wpdb->prefix."$table";
+    $table_charset = $wpdb->get_charset_collate();
+    $field_names = [];
+    // GETTING `headers sent error`
+    // FIND OUT WHY
+    $check_id = $fields['id']  ? 'id' : 'image_id';
+    
+    foreach ($fields as $field => $type) {
+      if ($type === 'int(9)') {
+        $field_names[] = "$field $type NOT NULL";
+      } else {
+          $field_names[] = "$field $type";
+      }
+    }
+    
+    $field_names = join(",\n", $field_names);
+    
+    $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            $field_names,
+            PRIMARY KEY  ($check_id)
+            ) $table_charset;";
+            
+    require_once ABSPATH.'wp-admin/includes/upgrade.php';
+    
+    dbDelta($sql);
+  }
+  
+  // Update Database
+  // public static function update_database(string $table, array $fields) {
+    
+  //   global $wpdb;
+  //   $table_name    = $wpdb->prefix."$table";
+  //   $sql           = "SELECT
+  //                     id
+  //                     FROM
+  //                     $table_name;";
+  //   $result        = $wpdb->get_results($sql);
+    
+  //   if (count($result) === 0) {
+  //     $sql = "INSERT INTO $table_name (
+  //             id, transition_time, loop_carousel, stop_on_hover, reverse_order, navigation_arrows, show_pagination)
+  //             VALUES (
+  //             NULL, $transition_time, '$loop_carousel', '$stop_on_hover', '$reverse_order', '$navigation_arrows', '$show_pagination');";
+              
+  //     $wpdb->query($sql);
+  //   } else {
+  //       $sql = "UPDATE $table_name
+  //               SET
+  //               transition_time = $transition_time,
+  //               loop_carousel = '$loop_carousel',
+  //               stop_on_hover = '$stop_on_hover',
+  //               reverse_order = '$reverse_order',
+  //               navigation_arrows = '$navigation_arrows',
+  //               show_pagination = '$show_pagination';";
+                
+  //       $wpdb->query($sql);
+  //   }
+  // }
+}
