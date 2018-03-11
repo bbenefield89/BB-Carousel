@@ -131,6 +131,7 @@ addNewImageButton.addEventListener('click', e => {
   }
 }); // click
 
+// removing an image
 sliderImageDivContainer.addEventListener('click', e => {
   const removeImage = document.querySelectorAll('.remove-image');
   

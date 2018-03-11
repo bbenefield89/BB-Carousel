@@ -5,7 +5,6 @@ namespace Inc\Database;
 class SliderSettings extends Database {
   public function __construct() {}
   
-  
   // creates initial DB table
   public function create_db(string $table, array $fields) {
     $this->create_db_table($table, $fields);
@@ -17,21 +16,21 @@ class SliderSettings extends Database {
     global $wpdb;
     $table_name = $wpdb->prefix.'bb_slidersettings';
     $sql = "SELECT
-            id
+              id
             FROM
-            $table_name;";
+              $table_name;";
     $result = $wpdb->get_results($sql);
     
     if (count($result) === 0) {
       $sql = "INSERT INTO $table_name(
-              id)
+                id)
               VALUES (
-              NULL);";
+                NULL);";
               
       $wpdb->query($sql);
     }
   }
-  
+    
   // UPDATE or INSERT into DB
   public function update_db(...$fields) {
     global $wpdb;

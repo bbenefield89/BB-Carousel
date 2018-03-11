@@ -84,10 +84,6 @@ final class Admin {
   
   // Outputs HTML to main admin page
   public static function html() {
-    $result = self::fill_default_values();
-    
-    var_dump($result);
-    
     // Check if `update_slider` Button has been Clicked
     if (isset($_POST['update_slider'])) {
       $transition_time   = sanitize_text_field($_POST['transition_time']);
@@ -132,18 +128,7 @@ final class Admin {
       $slider_settings_obj->update_db($slider_settings);
     }
     
-    if (isset($_POST['image_input_hidden'])) {
-      global $wpdb;
-      $table_name  = $wpdb->prefix.'bb_sliderimages';
-      $carousel_id = $_POST['carousel_id'];
-      $image_url   = $_POST['image_input_hidden'];
-      $sql         = "INSERT INTO $table_name (
-                        id, carousel_id, image_url)
-                      VALUES (
-                        NULL, $carousel_id, '$image_url');";
-              
-      $wpdb->query($sql);
-    }
+    $result = self::fill_default_values();
         
     ?>
     
@@ -171,7 +156,7 @@ final class Admin {
               <div class="advanced-options-p">
                 <p>Transition Time:</p>
               </div>
-              <input name="transition_time" min="1" max="10" pattern="\w" type="number" value="<?php echo $result[0]->transition_time; ?>">
+              <input name="transition_time" min="1" max="10" pattern="\w" type="number" value="<?php echo $result[0]->transition_time > 0 ? $result[0]->transition_time : 1; ?>">
             </div>
             
             <hr>
@@ -182,7 +167,7 @@ final class Admin {
                 <div class="advanced-options-p">
                   <p>Loop Carousel</p>
                 </div>
-                <input <?php if ($result[0]->loop_carousel) { echo 'checked="checked"'; } ?> name="loop_carousel" type="checkbox">
+                <input <?php echo $result[0]->loop_carousel ? "checked='checked'" : NULL; ?> name="loop_carousel" type="checkbox">
               </div>
             
               <!-- STOP ON HOVER OPTION -->
@@ -190,7 +175,7 @@ final class Admin {
                 <div class="advanced-options-p">
                   <p>Stop on Hover</p>
                 </div>
-                <input name="stop_on_hover" type="checkbox">
+                <input <?php echo $result[0]->stop_on_hover ? "checked='checked'" : NULL; ?> name="stop_on_hover" type="checkbox">
               </div>
               
               <!-- REVERSE ORDER OPTION -->
@@ -198,7 +183,7 @@ final class Admin {
                 <div class="advanced-options-p">
                   <p>Reverse Order</p>
                 </div>
-                <input name="reverse_order" type="checkbox">
+                <input <?php echo $result[0]->reverse_order ? "checked='checked'" : NULL; ?> name="reverse_order" type="checkbox">
               </div>
               
               <!-- NAVIGATION ARROWS OPTION -->
@@ -206,7 +191,7 @@ final class Admin {
                 <div class="advanced-options-p">
                   <p>Navigation Arrows</p>
                 </div>
-                <input name="navigation_arrows" type="checkbox">
+                <input <?php echo $result[0]->navigation_arrows ? "checked='checked'" : NULL; ?> name="navigation_arrows" type="checkbox">
               </div>
               
               <!-- SHOW PAGINATION OPTION -->
@@ -214,7 +199,7 @@ final class Admin {
                 <div class="advanced-options-p">
                   <p>Show Pagination</p>
                 </div>
-                <input name="show_pagination" type="checkbox">
+                <input <?php echo $result[0]->show_pagination ? "checked='checked'" : NULL; ?> name="show_pagination" type="checkbox">
               </div>
             </div><!-- advanced-options-container -->
           </section><!-- slider-settings-content -->
