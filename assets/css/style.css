@@ -163,6 +163,14 @@ input[name="slider_name"] {
 .slider-images .slider-image {
   margin: 15px;
   position: relative;
+  max-width: 200px;
+}
+
+.slider-image > img {
+  height: 200px;
+  width: 200px;
+  max-height: 200px;
+  max-width: 200px;
 }
 
 .remove-image {
