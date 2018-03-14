@@ -49,19 +49,20 @@
 }
 
 .image-carousel .next::after, .image-carousel .previous::after {
+  background: transparent;
+  box-sizing: border-box;
   content: '>';
+  cursor: pointer;
+  font-size: 40px;
+  font-weight: bold;
+  height: 3rem;
+  line-height: 3rem;
+  padding: 0 0.2rem;
   position: absolute;
   top: 50%;
   right: 0;
-  background: white;
-  width: 1rem;
-  height: 3rem;
-  font-weight: bold;
-  transform: translatey(-50%);
-  line-height: 3rem;
-  box-sizing: border-box;
-  padding: 0 0.2rem;
-  cursor: pointer;
+  transform: translateY(-50%);
+  width: 33px;
 }
 
 .image-carousel .previous::after {

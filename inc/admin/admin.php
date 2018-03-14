@@ -27,6 +27,7 @@ final class Admin {
       '',
       true
     );
+    wp_localize_script('bb-carousel-js', 'carousel', [ 'ajax_url' => admin_url('admin-ajax.php') ]);
   } // load_assets()
   
   // grabs values from DB and fills inputs on ADMIN PAGE
@@ -170,6 +171,9 @@ final class Admin {
                 <input <?php echo $result[0]->show_pagination ? "checked='checked'" : NULL; ?> name="show_pagination" type="checkbox">
               </div>
             </div><!-- advanced-options-container -->
+            
+            <button class="button button-primary button-large" name="update_slider" type="submit">Update</button>
+            
           </section><!-- slider-settings-content -->
         </article><!-- slider-settings-container -->
         
@@ -178,7 +182,7 @@ final class Admin {
             <h2>Slider Images</h2>
           </header>
           <section class="slider-images-content">
-            <button class="add-new-image button button-secondary" name="add_new_image" type="submit">Add New Image</button>
+            <button class="add-new-image button button-primary button-large" name="add_new_image" type="submit">Add New Image</button>
             <input class="image-url" type="text" placeholder="Image URL">
             <small class="text-red" id="new-image-error" hidden>Please enter a valid image url ending with: .jpg, .jpeg, .png, or .gif</small>
             <hr>
@@ -206,9 +210,9 @@ final class Admin {
       </main><!-- main -->
       
       <!-- ASIDE -->
-      <aside id="bb-carousel-aside">
+      <!-- <aside id="bb-carousel-aside">
         <button class="button button-primary button-large" name="update_slider" type="submit">Update</button>
-      </aside>
+      </aside> -->
     </form><!-- form -->
     <!-- END HTML -->
     

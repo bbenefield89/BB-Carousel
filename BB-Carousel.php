@@ -255,3 +255,51 @@ function shortcode_func() {
 
 // Plugin shortcode
 add_shortcode('bb_carousel', 'shortcode_func');
+
+add_action('wp_ajax_carousel', 'get_carousel');
+add_action('wp_ajax_nopriv_carousel', 'get_carousel');
+
+function get_carousel() {
+  if ($_POST['image_input_hidden']) {
+    global $wpdb;
+    $table_name = $wpdb->prefix.'bb_sliderimages';
+    $image_url  = $_POST['image_input_hidden'];
+    $sql        = "SELECT
+                     image_id,
+                     carousel_id,
+                     image_url
+                   FROM
+                     $table_name
+                   ORDER BY image_id DESC
+                   LIMIT 1;";
+            
+    $results = $wpdb->insert($table_name, [
+      'image_id'    => NULL,
+      'carousel_id' => 1,
+      'image_url'   => $image_url
+    ]);
+    
+    $results = $wpdb->get_results($sql);
+    
+    if ($results) {
+      header('Content-Type: application/json;charset=UTF-8');
+      echo wp_json_encode($results);
+      die();
+    }
+  }
+  
+  if ($_POST['image_id']) {
+    global $wpdb;
+    $table_name = $wpdb->prefix.'bb_sliderimages';
+    $image_id   = $_POST['image_id'];
+    $sql        = "DELETE
+                   FROM
+                     $table_name
+                   WHERE
+                     image_id = $image_id;";
+              
+    $wpdb->query($sql);
+  }
+  
+  die();
+}
