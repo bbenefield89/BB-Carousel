@@ -1,8 +1,9 @@
 (function bb_carousel() {
   const carousels = document.querySelectorAll('.image-carousel');
-
+  
   // forEach
   [].forEach.call(carousels, c => {
+    console.log('asdad')
     let next = document.querySelector('.next');
     let prev = document.querySelector('.previous');
     let bubblesContainer = document.querySelector('.bubbles');
@@ -49,7 +50,7 @@
         }
         
         switchImg();
-      }, 3000);
+      }, 1000);
     }
     
     // inner mouseenter
