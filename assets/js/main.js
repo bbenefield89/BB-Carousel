@@ -23,7 +23,7 @@ const sliderImageDivContainer = document.querySelector('.slider-images');
 /*****************
 ** 2. FUNCTIONS **
 *****************/
-const makeAJAXRequest = (reqType, URL, formData) => {
+const makeAJAXRequest = (reqType, URL, formData = '') => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     
@@ -31,15 +31,15 @@ const makeAJAXRequest = (reqType, URL, formData) => {
     
     if (reqType === 'POST') {
       xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          resolve(xhr.responseText);
+        } else {
+            reject(xhr.statusText);
+        }
+      };
     }
-    
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        resolve(xhr.response);
-      } else {
-          reject(xhr.statusText);
-      }
-    };
     
     xhr.onerror = () => {
       reject(xhr.statusText);
@@ -82,9 +82,9 @@ sliderSettingsHeader.addEventListener('click', () => {
 addNewImageButton.addEventListener('click', e => {
   e.preventDefault();
   
-  const sliderImagesDiv = document.querySelector('.slider-images');
-  const imageURL        = document.querySelector('.image-url');
-  const newImageError   = document.querySelector('#new-image-error');
+  const sliderImagesDiv     = document.querySelector('.slider-images');
+  const imageURL            = document.querySelector('.image-url');
+  const newImageError       = document.querySelector('#new-image-error');
   const allImageInputHidden = document.querySelectorAll('.image-input-hidden');
   
   // Create elements
@@ -92,6 +92,7 @@ addNewImageButton.addEventListener('click', e => {
   const sliderImage      = document.createElement('img');
   const removeImage      = document.createElement('span');
   const imageInputHidden = document.createElement('input');
+  const imageID          = document.createElement('input');
   
   // Set necessary element attributes
   sliderImageDiv.classList.add('slider-image');
@@ -106,18 +107,18 @@ addNewImageButton.addEventListener('click', e => {
   imageInputHidden.setAttribute('name', 'image_input_hidden');
   imageInputHidden.setAttribute('value', imageURL.value);
   
-  // If NOT valid image do nothing
+  // If NOT valid image show error
   sliderImage.onerror = () => {
     newImageError.removeAttribute('hidden');
     
     return;
   }
   
-  // If valid image insert new image to page
+  // If valid image => insert new image to page
   sliderImage.onload = () => {
-    const reqType = 'POST';
-    const URL = '/weveloper/wp-admin/admin.php?page=bb_ajax';
-    const formData = `image_input_hidden=${ imageInputHidden.value }`;
+    const reqType  = 'POST';
+    const URL      = 'admin-ajax.php';
+    const formData = `action=carousel&image_input_hidden=${ imageInputHidden.value }`;
     
     newImageError.setAttribute('hidden', '');
     
@@ -127,7 +128,16 @@ addNewImageButton.addEventListener('click', e => {
     
     sliderImageDiv.insertAdjacentElement('beforeend', removeImage);
     
-    makeAJAXRequest(reqType, URL, formData);
+    makeAJAXRequest(reqType, URL, formData)
+      .then(data => {
+        const dataParsed   = JSON.parse(data);
+        const imageIDInput = document.createElement('input');
+        
+        imageIDInput.setAttribute('hidden', '');
+        imageIDInput.setAttribute('value', dataParsed[0].image_id);
+        
+        sliderImageDiv.insertAdjacentElement('beforeend', imageIDInput);
+      });
   }
 }); // click
 
@@ -137,11 +147,25 @@ sliderImageDivContainer.addEventListener('click', e => {
   
   if (e.target.classList[0] === 'remove-image') {
     const reqType = 'POST';
-    const URL = '/weveloper/wp-admin/admin.php?page=bb_ajax';
+    const URL = 'admin-ajax.php';
     const imageID = e.path[1].children[3];
     
     e.path[1].setAttribute('hidden', '');
     
-    makeAJAXRequest(reqType, URL, `image_id=${ e.path[1].children[3].value }`);
+    makeAJAXRequest(reqType, URL, `action=carousel&image_id=${ e.path[1].children[3].value }`);
   }
 });
+
+//jQuery way of using AJAX with WP
+// jQuery(document).on('click', sliderImageDivContainer, () => {
+//   jQuery.ajax({
+//     url: carousel.ajax_url,
+//     type: 'get',
+//     data: {
+//       action: 'carousel'
+//     },
+//     success: function(data) {
+//       alert(data);
+//     }
+//   });
+// });

@@ -117,7 +117,6 @@ input[name="slider_name"] {
 }
 
 .transition-time-container input {
-  box-shadow: inset 2px 2px 5px 1px rgba(0, 0, 0, .3);
   margin-right: 5px;
   width: 70px;
 }
@@ -129,6 +128,7 @@ input[name="slider_name"] {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  margin-bottom: 1.5rem;
   width: 100%;
   max-width: 400px;
 }
