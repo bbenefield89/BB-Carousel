@@ -52,9 +52,7 @@ function activation_methods() {
   $slider_settings_fields = [
     'id'                => 'int(9)',
     'transition_time'   => 'int(9)',
-    'loop_carousel'     => 'tinytext',
     'stop_on_hover'     => 'tinytext',
-    'reverse_order'     => 'tinytext',
     'navigation_arrows' => 'tinytext',
     'show_pagination'   => 'tinytext'
   ];
@@ -89,15 +87,25 @@ function shortcode_func() {
   global $wpdb;
   $table_name = $wpdb->prefix.'bb_sliderimages';
   $sql = "SELECT
-            image_id,
-            carousel_id,
-            image_url
+            ss.id,
+            ss.transition_time,
+            ss.stop_on_hover,
+            ss.navigation_arrows,
+            ss.show_pagination,
+            si.image_id,
+            si.carousel_id,
+            si.image_url
           FROM
-            $table_name;";
+            wp_bb_slidersettings ss
+          JOIN
+            wp_bb_sliderimages si
+          ON
+            ss.id = si.carousel_id;";
             
   $results = $wpdb->get_results($sql);
   
   if (count($results) > 0) :
+    // var_dump($results);
   ?>
   
     <link rel="stylesheet" href="<?php echo plugins_url('assets/css/bb-carousel.css', __FILE__); ?>">
@@ -108,28 +116,140 @@ function shortcode_func() {
           <div class="image-carousel">
             <div class="inner">
   
-  <?php
-    foreach ($results as $key => $val) :
-    ?>
-    
-      <img class="carousel one" src="<?php echo $val->image_url; ?>">
-      
-    <?php
-    endforeach;
-    ?>
+  <?php foreach ($results as $key => $val) : ?>
+    <img class="carousel one" src="<?php echo $val->image_url; ?>">
+  <?php endforeach; ?>
     
             </div>
-            <div class="bubbles"></div>
-            <div class="previous"></div>
-            <div class="next"></div>
+            
+            <?php if ($results[0]->show_pagination) : ?>
+              <div class="bubbles"></div>
+            <?php endif; ?>
+            
+            <?php if ($results[0]->navigation_arrows) : ?>
+              <div class="previous"></div>
+              <div class="next"></div>
+            <?php endif; ?>
+            
           </div>
         </div>
       </div>
     </div>
     
-    <script src="<?php echo plugins_url('assets/js/bb-carousel.js', __FILE__); ?>"></script>
+    <?php
     
-  <?php
+      $transition_time = $results[0]->transition_time;
+      
+      $bb_carousel_js = "<script>\n";
+      $bb_carousel_js .= "
+        (function bb_carousel() {
+          const carousels = document.querySelectorAll('.image-carousel');
+          
+          // forEach
+          [].forEach.call(carousels, c => {
+            console.log('asdad')
+            let next = document.querySelector('.next');
+            let prev = document.querySelector('.previous');
+            let bubblesContainer = document.querySelector('.bubbles');
+            let inner = document.querySelector('.inner');
+            let imgs = document.querySelectorAll('.inner img');
+            let currentImageIndex = 0;
+            let width = 100;
+            let bubbles = [];
+            let interval = start();\n";
+            
+      if ($results[0]->show_pagination) {
+        $bb_carousel_js .= "
+          // for
+          for (let i = 0; i < imgs.length; i++) {
+            let b = document.createElement('span');
+            b.classList.add('bubble');
+            bubblesContainer.append(b);
+            bubbles.push(b);
+            
+            b.addEventListener('click', () => {
+              currentImageIndex = i;
+              switchImg();
+            });
+          } // endfor\n";
+      }
+      
+      $bb_carousel_js .= "
+        // switchImg()
+        function switchImg() {
+          inner.style.left = -width * currentImageIndex + '%';
+          
+          bubbles.forEach(function (b, i) {
+            if (i === currentImageIndex) {
+              b.classList.add('active');
+            } else {
+                b.classList.remove('active');
+            }
+          });
+        } // switchImg()
+        
+        // start()
+        function start() {
+          return setInterval(() => {
+            currentImageIndex++;
+            
+            if (currentImageIndex >= imgs.length) {
+              currentImageIndex = 0;
+            }
+            
+            switchImg();\n";
+        
+        $bb_carousel_js .= "
+            }, ".$transition_time."000);
+          }\n";
+        
+      if ($results[0]->stop_on_hover) {
+        $bb_carousel_js .= "
+          // inner mouseenter
+          inner.addEventListener('mouseenter', () => {
+            clearInterval(interval);
+          });
+          
+          // inner mouseleave
+          inner.addEventListener('mouseleave', () => {
+            interval = start();
+          });\n";
+      }
+      
+      if ($results[0]->navigation_arrows) {
+        $bb_carousel_js .= "
+          // `next` button click
+          next.addEventListener('click', () => {
+            currentImageIndex++;
+            
+            if (currentImageIndex >= imgs.length) {
+              currentImageIndex = 0;
+            }
+            
+            switchImg();
+          });
+          
+          // `prev` button click
+          prev.addEventListener('click', () => {
+            currentImageIndex--;
+            
+            if (currentImageIndex < 0) {
+              currentImageIndex = imgs.length - 1;
+            }
+            
+            switchImg();
+          });\n";
+      }
+      
+      $bb_carousel_js .= "
+            switchImg();
+          });
+        }());\n";
+      
+      $bb_carousel_js .= "</script>";
+      
+      echo $bb_carousel_js;
+    
   endif;
 }
 

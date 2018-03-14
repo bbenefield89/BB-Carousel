@@ -12,9 +12,7 @@ function activation_methods() {
   $slider_settings_fields = [
     'id'                => 'int(9)',
     'transition_time'   => 'int(9)',
-    'loop_carousel'     => 'tinytext',
     'stop_on_hover'     => 'tinytext',
-    'reverse_order'     => 'tinytext',
     'navigation_arrows' => 'tinytext',
     'show_pagination'   => 'tinytext'
   ];

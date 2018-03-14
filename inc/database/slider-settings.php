@@ -43,9 +43,9 @@ class SliderSettings extends Database {
     
     if (count($result) === 0) {
       $sql = "INSERT INTO $table_name (
-              id, transition_time, loop_carousel, stop_on_hover, reverse_order, navigation_arrows, show_pagination)
+              id, transition_time, stop_on_hover, navigation_arrows, show_pagination)
               VALUES (
-              NULL, $transition_time, '$loop_carousel', '$stop_on_hover', '$reverse_order', '$navigation_arrows', '$show_pagination');";
+              NULL, $transition_time, '$stop_on_hover', '$navigation_arrows', '$show_pagination');";
               
       $wpdb->query($sql);
     } else {

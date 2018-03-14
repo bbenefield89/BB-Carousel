@@ -37,9 +37,7 @@ final class Admin {
       "SELECT
         s.id,
         s.transition_time,
-        s.loop_carousel,
         s.stop_on_hover,
-        s.reverse_order,
         s.navigation_arrows,
         s.show_pagination,
         i.image_id,
@@ -56,9 +54,7 @@ final class Admin {
           "SELECT
              id,
              transition_time,
-             loop_carousel,
              stop_on_hover,
-             reverse_order,
              navigation_arrows,
              show_pagination
            FROM
@@ -87,21 +83,11 @@ final class Admin {
     // Check if `update_slider` Button has been Clicked
     if (isset($_POST['update_slider'])) {
       $transition_time   = sanitize_text_field($_POST['transition_time']);
-      $loop_carousel     = isset($_POST['loop_carousel'])
-                           ?
-                             sanitize_text_field($_POST['loop_carousel'])
-                           :
-                             $_POST['loop_carousel'] = '';
       $stop_on_hover     = isset($_POST['stop_on_hover'])
                            ?
                              sanitize_text_field($_POST['stop_on_hover'])
                            :
                              $_POST['stop_on_hover'] = '';
-      $reverse_order     = isset($_POST['reverse_order'])
-                           ?
-                             sanitize_text_field($_POST['reverse_order'])
-                           :
-                             $_POST['reverse_order'] = '';
       $navigation_arrows = isset($_POST['navigation_arrows'])
                            ?
                              sanitize_text_field($_POST['navigation_arrows'])
@@ -115,9 +101,7 @@ final class Admin {
       
       $slider_settings = [
           'transition_time'   => $transition_time,
-          'loop_carousel'     => $loop_carousel,
           'stop_on_hover'     => $stop_on_hover,
-          'reverse_order'     => $reverse_order,
           'navigation_arrows' => $navigation_arrows,
           'show_pagination'   => $show_pagination,
         ];
@@ -161,29 +145,13 @@ final class Admin {
             
             <hr>
             
-            <!-- LOOP CAROUSEL OPTION -->
+            <!-- STOP ON HOVER OPTION -->
             <div class="advanced-options-container">
-              <div class="loop-carousel-container">
-                <div class="advanced-options-p">
-                  <p>Loop Carousel</p>
-                </div>
-                <input <?php echo $result[0]->loop_carousel ? "checked='checked'" : NULL; ?> name="loop_carousel" type="checkbox">
-              </div>
-            
-              <!-- STOP ON HOVER OPTION -->
               <div class="stop-on-hover-container">
                 <div class="advanced-options-p">
                   <p>Stop on Hover</p>
                 </div>
                 <input <?php echo $result[0]->stop_on_hover ? "checked='checked'" : NULL; ?> name="stop_on_hover" type="checkbox">
-              </div>
-              
-              <!-- REVERSE ORDER OPTION -->
-              <div class="reverse-order-container">
-                <div class="advanced-options-p">
-                  <p>Reverse Order</p>
-                </div>
-                <input <?php echo $result[0]->reverse_order ? "checked='checked'" : NULL; ?> name="reverse_order" type="checkbox">
               </div>
               
               <!-- NAVIGATION ARROWS OPTION -->
@@ -249,9 +217,16 @@ final class Admin {
   } // html()
   
   public static function ajax_page() {
+        // Request from shortcode from the front end
+    if (isset($_GET['bb_carousel'])) {
+      var_dump($_GET);
+      var_dump($_POST);
+    }
+    
     global $wpdb;
     $table_name = $wpdb->prefix.'bb_sliderimages';
     
+    // image_input_hidden
     if (isset($_POST['image_input_hidden'])) {
       $image_url  = $_POST['image_input_hidden'];
       $sql        = "INSERT INTO $table_name (
@@ -262,6 +237,7 @@ final class Admin {
       $wpdb->query($sql);
     }
     
+    // image_id
     if (isset($_POST['image_id'])) {
       $image_id = $_POST['image_id'];
       $sql = "DELETE
