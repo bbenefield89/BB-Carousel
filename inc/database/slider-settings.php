@@ -75,9 +75,9 @@ class SliderSettings extends Database {
                      SET
                        carousel_id = %d
                      WHERE
-                       carousel_id <> %d;";
-                       
-      $sql = $wpdb->prepare($sql, [ $new_carousel_id, $new_carousel_id ]);
+                       carousel_id <> %d;";           
+      $sql        = $wpdb->prepare($sql, [ $new_carousel_id, $new_carousel_id ]);
+      
       $wpdb->query($sql);
     } else {
         $wpdb->update($table_name, [
