@@ -122,7 +122,6 @@ final class Admin {
     $stop_on_hover = sanitize_text_field($result[0]->stop_on_hover);
     $navigation_arrows = sanitize_text_field($result[0]->navigation_arrows);
     $show_pagination = sanitize_text_field($result[0]->show_pagination);
-    $image_url = sanitize_text_field($result[0]->image_url);
         
     ?>
     
@@ -196,7 +195,7 @@ final class Admin {
               <!-- IMAGES DYNAMICALLY FILLED WITH JS -->
               
             <?php
-              if (isset($image_url)) :
+              if (isset($result[0]->image_url)) :
                 foreach ($result as $key) :
                   $image_url = esc_url($key->image_url);
                   $id        = sanitize_text_field($key->id);
