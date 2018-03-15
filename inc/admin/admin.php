@@ -85,6 +85,7 @@ final class Admin {
   public static function html() {
     // Check if `update_slider` Button has been Clicked
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $table_id          = sanitize_text_field($_POST['carousel_id']);
       $transition_time   = sanitize_text_field($_POST['transition_time']);
       $stop_on_hover     = isset($_POST['stop_on_hover'])
                            ?
@@ -103,6 +104,7 @@ final class Admin {
                              $_POST['show_pagination'] = '';
       
       $slider_settings = [
+          'carousel_id'       => $table_id,
           'transition_time'   => $transition_time,
           'stop_on_hover'     => $stop_on_hover,
           'navigation_arrows' => $navigation_arrows,
