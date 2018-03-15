@@ -34,55 +34,58 @@ final class Admin {
   protected static function fill_default_values() {
     global $wpdb;
     $table_name = $wpdb->prefix.'bb_slidersettings';
-    $result = $wpdb->get_results(
-      "SELECT
-        s.id,
-        s.transition_time,
-        s.stop_on_hover,
-        s.navigation_arrows,
-        s.show_pagination,
-        i.image_id,
-        i.carousel_id,
-        i.image_url
-      FROM
-        wp_bb_slidersettings s
-      JOIN
-        wp_bb_sliderimages i on s.id = i.carousel_id"
-    );
+    $sql        = "SELECT
+                     s.id,
+                     s.transition_time,
+                     s.stop_on_hover,
+                     s.navigation_arrows,
+                     s.show_pagination,
+                     i.image_id,
+                     i.carousel_id,
+                     i.image_url
+                   FROM
+                     wp_bb_slidersettings s
+                   JOIN
+                     wp_bb_sliderimages i on s.id = i.carousel_id";
+                     
+    $result     = $wpdb->get_results($sql);
     
     if (!$result) {
-      $result = $wpdb->get_results(
-          "SELECT
-             id,
-             transition_time,
-             stop_on_hover,
-             navigation_arrows,
-             show_pagination
-           FROM
-             $table_name
-           ORDER BY id ASC
-           LIMIT 1;"
-        );
+      $sql    = "SELECT
+                   id,
+                   transition_time,
+                   stop_on_hover,
+                   navigation_arrows,
+                   show_pagination
+                 FROM
+                   $table_name
+                 ORDER BY id ASC
+                 LIMIT 1;";
+      $result = $wpdb->get_results($sql);
     } // endif
     
     return $result;
   }// fill_default_values()
   
-  protected static function loop_images() {
-    global $wpdb;
-    $table_name = $wpdb->prefix.'bb_sliderimages';
-    $sql = "SELECT
-              id,
-              carousel_id,
-              image_url
-            FROM
-              $table_name;";
-  }
+  /************************************
+  ** I DONT THINK THIS DOES ANYTHING **
+  ************************************/
+  // protected static function loop_images() {
+  //   global $wpdb;
+  //   $table_name = $wpdb->prefix.'bb_sliderimages';
+  //   $sql = "SELECT
+  //             id,
+  //             carousel_id,
+  //             image_url
+  //           FROM
+  //             $table_name;";
+  // }
   
   // Outputs HTML to main admin page
   public static function html() {
     // Check if `update_slider` Button has been Clicked
-    if (isset($_POST['update_slider'])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $table_id          = sanitize_text_field($_POST['carousel_id']);
       $transition_time   = sanitize_text_field($_POST['transition_time']);
       $stop_on_hover     = isset($_POST['stop_on_hover'])
                            ?
@@ -101,6 +104,7 @@ final class Admin {
                              $_POST['show_pagination'] = '';
       
       $slider_settings = [
+          'carousel_id'       => $table_id,
           'transition_time'   => $transition_time,
           'stop_on_hover'     => $stop_on_hover,
           'navigation_arrows' => $navigation_arrows,
@@ -114,12 +118,18 @@ final class Admin {
     }
     
     $result = self::fill_default_values();
+    
+    $id = sanitize_text_field($result[0]->id);
+    $transition_time = sanitize_text_field($result[0]->transition_time);
+    $stop_on_hover = sanitize_text_field($result[0]->stop_on_hover);
+    $navigation_arrows = sanitize_text_field($result[0]->navigation_arrows);
+    $show_pagination = sanitize_text_field($result[0]->show_pagination);
         
     ?>
     
     <!-- BEGIN HTML -->
     <form id="bb-carousel-form" action="" method="POST">
-      <input name="carousel_id" type="hidden" value="<?php echo $result[0]->id; ?>">
+      <input name="carousel_id" type="hidden" value="<?php echo $id; ?>">
       
       <main id="bb-carousel-main">
         
@@ -141,7 +151,7 @@ final class Admin {
               <div class="advanced-options-p">
                 <p>Transition Time:</p>
               </div>
-              <input name="transition_time" min="1" max="10" pattern="\w" type="number" value="<?php echo $result[0]->transition_time > 0 ? $result[0]->transition_time : 1; ?>">
+              <input name="transition_time" min="1" max="10" pattern="\w" type="number" value="<?php echo $transition_time > 0 ? $transition_time : 1; ?>">
             </div>
             
             <hr>
@@ -152,7 +162,7 @@ final class Admin {
                 <div class="advanced-options-p">
                   <p>Stop on Hover</p>
                 </div>
-                <input <?php echo $result[0]->stop_on_hover ? "checked='checked'" : NULL; ?> name="stop_on_hover" type="checkbox">
+                <input <?php echo $stop_on_hover ? "checked='checked'" : NULL; ?> name="stop_on_hover" type="checkbox">
               </div>
               
               <!-- NAVIGATION ARROWS OPTION -->
@@ -160,7 +170,7 @@ final class Admin {
                 <div class="advanced-options-p">
                   <p>Navigation Arrows</p>
                 </div>
-                <input <?php echo $result[0]->navigation_arrows ? "checked='checked'" : NULL; ?> name="navigation_arrows" type="checkbox">
+                <input <?php echo $navigation_arrows ? "checked='checked'" : NULL; ?> name="navigation_arrows" type="checkbox">
               </div>
               
               <!-- SHOW PAGINATION OPTION -->
@@ -168,12 +178,9 @@ final class Admin {
                 <div class="advanced-options-p">
                   <p>Show Pagination</p>
                 </div>
-                <input <?php echo $result[0]->show_pagination ? "checked='checked'" : NULL; ?> name="show_pagination" type="checkbox">
+                <input <?php echo $show_pagination ? "checked='checked'" : NULL; ?> name="show_pagination" type="checkbox">
               </div>
             </div><!-- advanced-options-container -->
-            
-            <button class="button button-primary button-large" name="update_slider" type="submit">Update</button>
-            
           </section><!-- slider-settings-content -->
         </article><!-- slider-settings-container -->
         
@@ -182,7 +189,7 @@ final class Admin {
             <h2>Slider Images</h2>
           </header>
           <section class="slider-images-content">
-            <button class="add-new-image button button-primary button-large" name="add_new_image" type="submit">Add New Image</button>
+            <button class="add-new-image button button-secondary" name="add_new_image" type="submit">Add New Image</button>
             <input class="image-url" type="text" placeholder="Image URL">
             <small class="text-red" id="new-image-error" hidden>Please enter a valid image url ending with: .jpg, .jpeg, .png, or .gif</small>
             <hr>
@@ -191,13 +198,16 @@ final class Admin {
               
             <?php
               if (isset($result[0]->image_url)) :
-                foreach ($result as $key) :    
+                foreach ($result as $key) :
+                  $image_url = esc_url($key->image_url);
+                  $id        = sanitize_text_field($key->id);
+                  $image_id  = sanitize_text_field($key->image_id);
             ?>
                   <div class="slider-image">
-                    <img src="<?php echo $key->image_url; ?>">
+                    <img src="<?php echo $image_url; ?>">
                     <span class="remove-image">×</span>
-                    <input name="image_input_hidden" type="hidden" value="<?php echo $key->id; ?>">
-                    <input name="image_id" type="hidden" value="<?php echo $key->image_id; ?>">
+                    <input name="image_input_hidden" type="hidden" value="<?php echo $id; ?>">
+                    <input name="image_id" type="hidden" value="<?php echo $image_id; ?>">
                   </div>    
             <?php
                 endforeach;
@@ -210,9 +220,9 @@ final class Admin {
       </main><!-- main -->
       
       <!-- ASIDE -->
-      <!-- <aside id="bb-carousel-aside">
+      <aside id="bb-carousel-aside">
         <button class="button button-primary button-large" name="update_slider" type="submit">Update</button>
-      </aside> -->
+      </aside>
     </form><!-- form -->
     <!-- END HTML -->
     
@@ -221,36 +231,28 @@ final class Admin {
   } // html()
   
   public static function ajax_page() {
-        // Request from shortcode from the front end
-    if (isset($_GET['bb_carousel'])) {
-      var_dump($_GET);
-      var_dump($_POST);
-    }
-    
+    // Request from shortcode from the front end
     global $wpdb;
     $table_name = $wpdb->prefix.'bb_sliderimages';
     
     // image_input_hidden
     if (isset($_POST['image_input_hidden'])) {
-      $image_url  = $_POST['image_input_hidden'];
-      $sql        = "INSERT INTO $table_name (
-                       image_id, carousel_id, image_url)
-                     VALUES (
-                       NULL, 1, '$image_url');";
+      $image_url  = esc_url($_POST['image_input_hidden']);
               
-      $wpdb->query($sql);
+      $wpdb->insert($table_name, [
+        'image_id' => NULL,
+        'carousel_id' => 1,
+        'image_url' => $image_url
+      ]);
     }
     
     // image_id
     if (isset($_POST['image_id'])) {
-      $image_id = $_POST['image_id'];
-      $sql = "DELETE
-              FROM
-                $table_name
-              WHERE
-                image_id = $image_id;";
+      $image_id = sanitize_text_field($_POST['image_id']);
                 
-      $wpdb->query($sql);
+      $wpdb->delete($table_name, [
+        'image_id' => $image_id
+      ]);
     }
   }
   

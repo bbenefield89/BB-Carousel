@@ -15,11 +15,11 @@ class SliderSettings extends Database {
   protected function initial_insert() {
     global $wpdb;
     $table_name = $wpdb->prefix.'bb_slidersettings';
-    $sql = "SELECT
-              id
-            FROM
-              $table_name;";
-    $result = $wpdb->get_results($sql);
+    $sql        = "SELECT
+                     id
+                   FROM
+                     $table_name;";
+    $result     = $wpdb->get_results($sql);
     
     if (count($result) === 0) {
       $sql = "INSERT INTO $table_name(
@@ -34,38 +34,61 @@ class SliderSettings extends Database {
   // UPDATE or INSERT into DB
   public function update_db(...$fields) {
     global $wpdb;
-    $table_name    = $wpdb->prefix.'bb_slidersettings';
-    $sql           = "SELECT
-                      id
-                      FROM
-                      $table_name;";
-    $result        = $wpdb->get_results($sql);
+    $table_name        = $wpdb->prefix.'bb_slidersettings';
+    $table_id          = ($fields[0]['carousel_id']) ? sanitize_text_field($fields[0]['carousel_id']) : 0;
+    $transition_time   = sanitize_text_field($fields[0]['transition_time']);
+    $stop_on_hover     = sanitize_text_field($fields[0]['stop_on_hover']);
+    $navigation_arrows = sanitize_text_field($fields[0]['navigation_arrows']);
+    $show_pagination   = sanitize_text_field($fields[0]['show_pagination']);
+    $sql               = "SELECT
+                            id
+                          FROM
+                            $table_name
+                          WHERE
+                            id = $table_id;";
+    $result            = $wpdb->get_results($sql);
     
-    if (count($result) === 0) {
-      $sql = "INSERT INTO $table_name (
-              id, transition_time, stop_on_hover, navigation_arrows, show_pagination)
-              VALUES (
-              NULL, $transition_time, '$stop_on_hover', '$navigation_arrows', '$show_pagination');";
-              
+    if (!$result) { 
+      $wpdb->insert($table_name, [
+        'id' => NULL,
+        'transition_time'   => $transition_time,
+        'stop_on_hover'     => $stop_on_hover,
+        'navigation_arrows' => $navigation_arrows,
+        'show_pagination'   => $show_pagination
+      ]);
+      
+      $table_name = $wpdb->prefix.'bb_slidersettings';
+      $sql = "SELECT
+                id
+              FROM
+                $table_name
+              ORDER BY
+                id
+              DESC LIMIT 1;";
+      $result = $wpdb->get_results($sql);
+      $new_carousel_id = sanitize_text_field($result[0]->id);
+      
+      
+      $table_name = $wpdb->prefix.'bb_sliderimages';
+      $sql        = "UPDATE
+                       {$table_name}
+                     SET
+                       carousel_id = %d
+                     WHERE
+                       carousel_id <> %d;";           
+      $sql        = $wpdb->prepare($sql, [ $new_carousel_id, $new_carousel_id ]);
+      
       $wpdb->query($sql);
     } else {
-        $field_values = [];
-        
-        foreach ($fields[0] as $field => $value) {
-          if ($field === 'transition_time') {
-            $field_values[] = "$field = $value";
-          } else {
-              $field_values[] = "$field = '$value'";
-          }
-        }
-        
-        $field_values = join(",\n", $field_values);
-      
-        $sql = "UPDATE $table_name
-                SET
-                $field_values;";
-                
-        $wpdb->query($sql);
+        $wpdb->update($table_name, [
+          'transition_time'   => $transition_time,
+          'stop_on_hover'     => $stop_on_hover,
+          'navigation_arrows' => $navigation_arrows,
+          'show_pagination'   => $show_pagination
+        ],
+        [
+          'id' => $table_id
+        ]);
     }
   }
 }

@@ -105,7 +105,10 @@ function shortcode_func() {
   $results = $wpdb->get_results($sql);
   
   if (count($results) > 0) :
-    // var_dump($results);
+    $transition_time = sanitize_text_field($results[0]->transition_time);
+    $show_pagination = sanitize_text_field($results[0]->show_pagination);
+    $navigation_arrows = sanitize_text_field($results[0]->navigation_arrows);
+    $stop_on_hover = sanitize_text_field($results[0]->stop_on_hover);
   ?>
   
     <link rel="stylesheet" href="<?php echo plugins_url('assets/css/bb-carousel.css', __FILE__); ?>">
@@ -116,17 +119,19 @@ function shortcode_func() {
           <div class="image-carousel">
             <div class="inner">
   
-  <?php foreach ($results as $key => $val) : ?>
-    <img class="carousel one" src="<?php echo $val->image_url; ?>">
+  <?php foreach ($results as $key => $val) :
+    $image_url = esc_url($val->image_url);
+  ?>
+    <img class="carousel one" src="<?php echo $image_url; ?>">
   <?php endforeach; ?>
     
             </div>
             
-            <?php if ($results[0]->show_pagination) : ?>
+            <?php if ($show_pagination === 'on') :  ?>
               <div class="bubbles"></div>
             <?php endif; ?>
             
-            <?php if ($results[0]->navigation_arrows) : ?>
+            <?php if ($navigation_arrows === 'on') : ?>
               <div class="previous"></div>
               <div class="next"></div>
             <?php endif; ?>
@@ -138,7 +143,7 @@ function shortcode_func() {
     
     <?php
     
-      $transition_time = $results[0]->transition_time;
+      // $transition_time = $results[0]->transition_time;
       
       $bb_carousel_js = "<script>\n";
       $bb_carousel_js .= "
@@ -158,7 +163,7 @@ function shortcode_func() {
             let bubbles = [];
             let interval = start();\n";
             
-      if ($results[0]->show_pagination) {
+      if ($show_pagination === 'on') {
         $bb_carousel_js .= "
           // for
           for (let i = 0; i < imgs.length; i++) {
@@ -203,7 +208,7 @@ function shortcode_func() {
             }, ".$transition_time."000);
           }\n";
         
-      if ($results[0]->stop_on_hover) {
+      if ($stop_on_hover === 'on') {
         $bb_carousel_js .= "
           // inner mouseenter
           inner.addEventListener('mouseenter', () => {
@@ -216,7 +221,7 @@ function shortcode_func() {
           });\n";
       }
       
-      if ($results[0]->navigation_arrows) {
+      if ($navigation_arrows === 'on') {
         $bb_carousel_js .= "
           // `next` button click
           next.addEventListener('click', () => {
@@ -260,10 +265,13 @@ add_action('wp_ajax_carousel', 'get_carousel');
 add_action('wp_ajax_nopriv_carousel', 'get_carousel');
 
 function get_carousel() {
-  if ($_POST['image_input_hidden']) {
+  $POST_image_input_hidden = sanitize_text_field($_POST['image_input_hidden']);
+  $POST_image_id = sanitize_text_field($_POST['image_id']);
+  
+  if ($POST_image_input_hidden) {
     global $wpdb;
     $table_name = $wpdb->prefix.'bb_sliderimages';
-    $image_url  = $_POST['image_input_hidden'];
+    $image_url  = esc_url($_POST['image_input_hidden']);
     $sql        = "SELECT
                      image_id,
                      carousel_id,
@@ -288,17 +296,13 @@ function get_carousel() {
     }
   }
   
-  if ($_POST['image_id']) {
+  if ($POST_image_id) {
     global $wpdb;
     $table_name = $wpdb->prefix.'bb_sliderimages';
-    $image_id   = $_POST['image_id'];
-    $sql        = "DELETE
-                   FROM
-                     $table_name
-                   WHERE
-                     image_id = $image_id;";
+    $image_id   = sanitize_text_field($_POST['image_id']);
               
-    $wpdb->query($sql);
+    $wpdb->delete($table_name, [ 'image_id' => $image_id ]);
+    die();
   }
   
   die();
