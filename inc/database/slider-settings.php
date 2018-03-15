@@ -66,24 +66,19 @@ class SliderSettings extends Database {
                 id
               DESC LIMIT 1;";
       $result = $wpdb->get_results($sql);
-      $new_carousel_id = $result[0]->id;
+      $new_carousel_id = sanitize_text_field($result[0]->id);
       
       
       $table_name = $wpdb->prefix.'bb_sliderimages';
       $sql        = "UPDATE
                        {$table_name}
                      SET
-                       carousel_id = {$new_carousel_id}
+                       carousel_id = %d
                      WHERE
-                       carousel_id <> {$new_carousel_id};";
-      
+                       carousel_id <> %d;";
+                       
+      $sql = $wpdb->prepare($sql, [ $new_carousel_id, $new_carousel_id ]);
       $wpdb->query($sql);
-      // $wpdb->update($table_name, [
-      //   'carousel_id' => $result[0]->id
-      // ],
-      // [
-      //   ''
-      // ]);
     } else {
         $wpdb->update($table_name, [
           'transition_time'   => $transition_time,
